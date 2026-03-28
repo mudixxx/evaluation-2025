@@ -553,8 +553,9 @@ function toggleFS(id){
 initPlayer('vb');
 initPlayer('va');
 
-// cursor glow
+// cursor glow — 觸控裝置不啟動
 (function(){
+  if(window.matchMedia('(hover: none)').matches) return;
   const glow = document.getElementById('cursor-glow');
   let cx = 0, cy = 0, tx = 0, ty = 0;
   document.addEventListener('mousemove', e => {
