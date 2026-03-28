@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2025 設計成果</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fff;--bg2:#f7f7f7;--bg3:#efefef;--text:#111;--text2:#555;--text3:#999;--border:#e0e0e0;--border2:#ccc}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 48px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.nav-logo{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#111;text-decoration:none;font-weight:700}
+.nav-links{display:flex;gap:32px;list-style:none}
+.nav-links a{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;text-transform:uppercase;color:var(--text3);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:#111}
+.hero{padding:96px 48px 80px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto;gap:48px;align-items:end}
+#cursor-glow{position:fixed;width:140px;height:140px;border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);background:radial-gradient(ellipse at center, rgba(210,255,30,0.45) 0%, rgba(200,245,20,0.18) 45%, transparent 70%);filter:blur(14px);mix-blend-mode:multiply;transition:opacity .3s;opacity:0}
+.hero-side{font-family:'Space Mono',monospace;font-size:160px;font-weight:700;color:var(--bg3);line-height:1;user-select:none;align-self:flex-start}
+
+.hero-label{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--text3);margin-bottom:24px}
+.hero-title{font-size:clamp(44px,6vw,88px);font-weight:700;line-height:1.05;letter-spacing:-.03em;color:#111;margin-bottom:48px}
+.hero-stats{display:flex;gap:48px}
+.stat{display:flex;flex-direction:column;gap:4px}
+.stat-num{font-family:'Space Mono',monospace;font-size:32px;font-weight:700;color:#111;line-height:1}
+.stat-label{font-size:12px;letter-spacing:.1em;color:var(--text3);text-transform:uppercase;font-family:'Space Mono',monospace}
+section{padding:64px 48px;border-bottom:1px solid var(--border)}
+.sec-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:32px}
+.sec-eye{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.sec-title{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.sec-count{font-family:'Space Mono',monospace;font-size:56px;font-weight:700;color:var(--bg3);line-height:1;align-self:flex-end}
+.feat-highlights{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);border:1px solid var(--border);margin-bottom:24px}
+.feat-hl-item{background:var(--bg2);padding:20px 24px}
+.feat-hl-title{font-size:14px;font-weight:700;color:#111;margin-bottom:6px}
+.feat-hl-desc{font-size:14px;color:var(--text2);line-height:1.7}
+.filters{display:flex;gap:6px;margin-bottom:24px;flex-wrap:wrap}
+.f-btn{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:6px 14px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:all .15s;border-radius:2px}
+.f-btn:hover{border-color:var(--text);color:var(--text)}
+/* 所有 active 篩選鈕統一用 #111 */
+.f-btn.active,.f-btn.s-btn.active,.f-btn.m-btn.active,.f-btn.l-btn.active{background:#111;color:#fff;border-color:#111}
+
+/* ── FEAT GRID ── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));border-top:1px solid var(--border);border-left:1px solid var(--border)}
+.feat-item{display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:background .12s;position:relative}
+.feat-item::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;opacity:0;transition:opacity .15s}
+/* L > M > S 左側色條粗細 + 字重區分，文字統一 #111 */
+[data-lv="L"]::after{background:#111;width:3px}
+[data-lv="M"]::after{background:#555;width:2px}
+[data-lv="S"]::after{background:#bbb;width:2px}
+[data-lv="L"] .feat-name,[data-lv="M"] .feat-name,[data-lv="S"] .feat-name{font-weight:400}
+.feat-item:hover{background:var(--bg2)}
+.feat-item:hover::after{opacity:1}
+.feat-item.hidden{display:none}
+.feat-item a{display:flex;align-items:center;gap:10px;width:100%;color:inherit;text-decoration:none}
+/* badge 統一大小 12px，僅背景深淺區分 L/M/S */
+.badge{font-family:'Space Mono',monospace;font-size:12px;font-weight:700;letter-spacing:.06em;padding:2px 6px;border-radius:2px;flex-shrink:0;text-transform:uppercase;line-height:1.4}
+.l-b{background:#111;color:#fff}
+.m-b{background:#555;color:#fff}
+.s-b{background:#aaa;color:#fff}
+.feat-name{font-size:14px;color:#111;flex:1;line-height:1.5}
+.feat-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--text3);flex-shrink:0;width:22px;text-align:right}
+.feat-arr{font-size:12px;color:var(--text3);flex-shrink:0;opacity:0;transition:opacity .15s,transform .15s}
+.feat-item:hover .feat-arr{opacity:1;transform:translateX(2px)}
+
+/* ── REV GRID ── */
+.rev-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));border-top:1px solid var(--border);border-left:1px solid var(--border)}
+.rev-item{display:flex;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);transition:background .12s;position:relative}
+.rev-item::after{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--text3);opacity:0;transition:opacity .15s}
+.rev-item:hover{background:var(--bg2)}
+.rev-item:hover::after{opacity:1}
+.rev-item a{display:flex;align-items:center;gap:10px;width:100%;color:inherit;text-decoration:none}
+.rev-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--text3);flex-shrink:0;width:22px;text-align:right}
+.rev-name{font-size:14px;color:#111;flex:1;line-height:1.5}
+.rev-item:hover .rev-name{color:#111}
+.rev-arr{font-size:12px;color:var(--text3);flex-shrink:0;opacity:0;transition:opacity .15s,transform .15s}
+.rev-item:hover .rev-arr{opacity:1;transform:translateX(2px)}
+
+.tool-desc{max-width:560px;color:var(--text2);font-size:14px;line-height:1.8;margin-bottom:40px}
+.highlights{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-left:1px solid var(--border);margin-bottom:40px}
+.hl-item{padding:28px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+.hl-item.hl-metric{display:flex;flex-direction:column;justify-content:flex-end}
+.hl-metric-num{font-family:'Space Mono',monospace;font-size:40px;font-weight:700;color:#111;line-height:1;margin-bottom:8px}
+.hl-metric-label{font-size:14px;font-weight:700;color:#111;margin-bottom:4px}
+.hl-metric-sub{font-size:12px;color:var(--text3);line-height:1.6}
+.hl-metric-link{font-size:12px;color:var(--text3);margin-top:12px;text-decoration:underline;text-underline-offset:3px}
+.hl-num{font-family:'Space Mono',monospace;font-size:12px;color:var(--text3);letter-spacing:.15em;margin-bottom:16px}
+.hl-t{font-size:14px;font-weight:700;color:#111;margin-bottom:6px}
+.hl-d{font-size:12px;color:var(--text2);line-height:1.7}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.v-card{border:1px solid var(--border);overflow:hidden;background:var(--bg)}
+.v-hdr{padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--bg2)}
+.v-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.dot-b{background:#cc4444}.dot-a{background:#44aa66}
+.v-lbl{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--text3)}
+.v-ttl{font-size:14px;font-weight:500;color:#111;margin-left:auto}
+.v-box{aspect-ratio:16/10;background:#000;position:relative;overflow:hidden;cursor:pointer}
+.v-box video{width:100%;height:100%;object-fit:cover;display:block}
+/* 中央播放按鈕（未播放時顯示） */
+.play-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.18);transition:opacity .2s}
+.play-overlay.hidden{opacity:0;pointer-events:none}
+.play-btn-center{width:52px;height:52px;border-radius:50%;background:rgba(255,255,255,.92);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:transform .15s,background .15s}
+.play-btn-center:hover{transform:scale(1.08);background:#fff}
+.play-btn-center svg{width:18px;height:18px;fill:#111;margin-left:3px}
+/* 底部控制列 */
+.v-controls{position:absolute;bottom:0;left:0;right:0;padding:8px 12px 10px;background:linear-gradient(transparent,rgba(0,0,0,.55));display:flex;flex-direction:column;gap:6px;opacity:0;transition:opacity .2s}
+.v-box:hover .v-controls{opacity:1}
+.v-box.playing .v-controls{opacity:1}
+.v-progress-wrap{width:100%;height:3px;background:rgba(255,255,255,.3);border-radius:2px;cursor:pointer;position:relative}
+.v-progress-wrap:hover{height:5px}
+.v-progress-bar{height:100%;background:#fff;border-radius:2px;width:0%;transition:width .1s linear}
+.v-ctrl-row{display:flex;align-items:center;gap:10px}
+.v-play-pause{background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center}
+.v-fullscreen{background:none;border:none;cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;margin-left:auto}
+.v-fullscreen svg{width:14px;height:14px;fill:#fff}
+.v-play-pause svg{width:14px;height:14px;fill:#fff}
+.v-time{font-family:'Space Mono',monospace;font-size:11px;color:rgba(255,255,255,.8);letter-spacing:.04em}
+.v-cap{padding:12px 16px;font-size:12px;color:var(--text3);line-height:1.6;border-top:1px solid var(--border)}
+
+/* ── HR Q&A ── */
+.qa-section{background:var(--bg2)}
+.qa-block{max-width:800px}
+.qa-q{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.06em;color:var(--text2);margin-bottom:24px;padding:10px 14px;border-left:2px solid #111;background:var(--bg3);line-height:1.7}
+/* 每個大題用 qa-item 包住，標題＋縮排內容 */
+.qa-item{margin-bottom:32px}
+.qa-item-title{font-size:16px;font-weight:700;color:#111;margin-bottom:12px;line-height:1.5}
+.qa-body{font-size:14px;line-height:1.9;color:#111}
+.qa-body p{margin-bottom:10px}
+.qa-body p:last-child{margin-bottom:0}
+.qa-sub{font-size:14px;font-weight:700;color:#111;margin-top:16px;margin-bottom:6px}
+/* 縮排內容區塊 */
+.qa-indent{padding-left:20px;border-left:2px solid var(--border);margin-bottom:12px}
+.qa-indent p{font-size:14px;color:#111;line-height:1.9;margin-bottom:6px}
+.qa-indent p:last-child{margin-bottom:0}
+.qa-note{font-size:12px;color:var(--text3);margin-top:16px}
+
+footer{padding:32px 48px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;background:var(--bg3)}
+.ft{font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.15em;color:var(--text3);text-transform:uppercase}
+@media(max-width:768px){nav{padding:0 20px}.nav-links{display:none}.hero{padding:64px 20px 48px;grid-template-columns:1fr}.hero-side{display:none}.hero-stats{gap:32px}section{padding:48px 20px}.feat-grid,.rev-grid{grid-template-columns:1fr}.highlights{grid-template-columns:1fr}.cmp{grid-template-columns:1fr}footer{padding:24px 20px}}
+</style>
+</head>
+<body>
+<div id="cursor-glow"></div>
+<nav>
+  <a class="nav-logo" href="#">設計成果 2025/03 – 2026/03</a>
+  <ul class="nav-links">
+    <li><a href="#tool">小工具</a></li>
+    <li><a href="#features">功能設計</a></li>
+    <li><a href="#reviews">UI Review</a></li>
+    <li><a href="#qa">自我評估</a></li>
+  </ul>
+</nav>
+<div class="hero">
+  <div>
+    <div class="hero-label">Annual Performance Review</div>
+    <h1 class="hero-title">一年的設計產出</h1>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">1</div><div class="stat-label">自研小工具</div></div>
+      <div class="stat"><div class="stat-num">73</div><div class="stat-label">功能設計</div></div>
+      <div class="stat"><div class="stat-num">67</div><div class="stat-label">UI Review</div></div>
+    </div>
+  </div>
+  <div class="hero-side">73</div>
+</div>
+<section id="tool">
+  <div class="sec-hdr"><div><div class="sec-eye">Self-built Tool</div><h2 class="sec-title">自研 UI Review 小工具</h2></div></div>
+  <p class="tool-desc">為了提升 UI Review 效率，自行研發一套輔助工具。透過 Before vs. After 的對比，可以清楚看到導入工具前後的工作流程差異。</p>
+  <div class="highlights">
+    <div class="hl-item hl-metric">
+      <a href="#formula" style="text-decoration:none;color:inherit;display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:0">
+        <div class="hl-metric-num">20%</div>
+        <div class="hl-metric-label">整體工時節省</div>
+        <div class="hl-metric-sub">基礎視覺驗收效率提升 50%，整體 UI Review 工作流節省 20% 總工時</div>
+        <div class="hl-metric-link">查看公式</div>
+      </a>
+    </div>
+    <div class="hl-item"><div class="hl-num">01</div><div class="hl-t">效率大幅提升</div><div class="hl-d">告別繁瑣的手動逐一檢查，透過工具自動化處理重複性工作。</div></div>
+    <div class="hl-item"><div class="hl-num">02</div><div class="hl-t">精準度提高</div><div class="hl-d">系統化的檢查流程減少人為疏漏，確保每次 Review 品質一致。</div></div>
+    <div class="hl-item"><div class="hl-num">03</div><div class="hl-t">自主研發</div><div class="hl-d">從需求發現到工具設計、實現，完整展現跨領域解決問題的能力。</div></div>
+  </div>
+  <div class="cmp">
+    <div class="v-card">
+      <div class="v-hdr"><div class="v-dot dot-b"></div><span class="v-lbl">Before</span><span class="v-ttl">人工檢查</span></div>
+      <div class="v-box" id="box-vb" onclick="togglePlay('vb')">
+        <video id="vb" preload="metadata" playsinline><source src="UI_review-原始人工檢查_-_Compressed_with_FlexClip.mp4" type="video/mp4"></video>
+        <div class="play-overlay" id="ov-vb">
+          <button class="play-btn-center" onclick="event.stopPropagation();togglePlay('vb')">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+        <div class="v-controls">
+          <div class="v-progress-wrap" id="pw-vb" onclick="event.stopPropagation()">
+            <div class="v-progress-bar" id="pb-vb"></div>
+          </div>
+          <div class="v-ctrl-row">
+            <button class="v-play-pause" onclick="event.stopPropagation();togglePlay('vb')">
+              <svg id="ic-vb" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <span class="v-time" id="tm-vb">0:00 / 0:00</span>
+            <button class="v-fullscreen" onclick="event.stopPropagation();toggleFS('vb')" title="全螢幕">
+              <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="v-cap">原始流程：逐一手動檢查每個畫面，耗時費力且容易遺漏細節。</div>
+    </div>
+    <div class="v-card">
+      <div class="v-hdr"><div class="v-dot dot-a"></div><span class="v-lbl">After</span><span class="v-ttl">小工具輔助</span></div>
+      <div class="v-box" id="box-va" onclick="togglePlay('va')">
+        <video id="va" preload="metadata" playsinline><source src="UI_review-小工具.mov" type="video/mp4"></video>
+        <div class="play-overlay" id="ov-va">
+          <button class="play-btn-center" onclick="event.stopPropagation();togglePlay('va')">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+        </div>
+        <div class="v-controls">
+          <div class="v-progress-wrap" id="pw-va" onclick="event.stopPropagation()">
+            <div class="v-progress-bar" id="pb-va"></div>
+          </div>
+          <div class="v-ctrl-row">
+            <button class="v-play-pause" onclick="event.stopPropagation();togglePlay('va')">
+              <svg id="ic-va" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <span class="v-time" id="tm-va">0:00 / 0:00</span>
+            <button class="v-fullscreen" onclick="event.stopPropagation();toggleFS('va')" title="全螢幕">
+              <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="v-cap">導入工具後：自動化輔助流程讓 Review 更快速、更系統化、更準確。</div>
+    </div>
+  </div>
+</section>
+<section id="features">
+  <div class="sec-hdr"><div><div class="sec-eye">Feature Design</div><h2 class="sec-title">功能設計與優化</h2></div><div class="sec-count">73</div></div>
+  <div class="feat-highlights">
+    <div class="feat-hl-item">
+      <div class="feat-hl-title">AI 輔助技術共識</div>
+      <div class="feat-hl-desc">複雜互動先用 AI 快速產出 Prototype，與 RD 對齊後再設計，降低後期修改成本。</div>
+    </div>
+    <div class="feat-hl-item">
+      <div class="feat-hl-title">系統化設計思維</div>
+      <div class="feat-hl-desc">重複性邏輯整理為通用元件，客製需求昇華為標準化產品架構。</div>
+    </div>
+  </div>
+  <div class="filters">
+    <button class="f-btn active" data-f="all">全部</button>
+    <button class="f-btn s-btn" data-f="S">S — Small</button>
+    <button class="f-btn m-btn" data-f="M">M — Medium</button>
+    <button class="f-btn l-btn" data-f="L">L — Large</button>
+  </div>
+  <div class="feat-grid">
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-19913" target="_blank"><span class="feat-num">01</span><span class="badge s-b">S</span><span class="feat-name">優惠券｜新增不可編輯序號發放數量情境</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-19939" target="_blank"><span class="feat-num">02</span><span class="badge s-b">S</span><span class="feat-name">推播｜LINE 渠道不支援發送序號包優惠券</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20386" target="_blank"><span class="feat-num">03</span><span class="badge s-b">S</span><span class="feat-name">對話｜可將對話手動設定為「未讀」</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20078" target="_blank"><span class="feat-num">04</span><span class="badge s-b">S</span><span class="feat-name">串接社群通訊渠道｜Co-existence for WhatsApp Business App</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-19744" target="_blank"><span class="feat-num">05</span><span class="badge s-b">S</span><span class="feat-name">標籤管理｜每日貼標次數支援圖表顯示、匯出</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-16542" target="_blank"><span class="feat-num">06</span><span class="badge m-b">M</span><span class="feat-name">機器人｜自訂屬性支援相對時間、特定月份篩選條件</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><span class="feat-num">07</span><span class="badge s-b">S</span><span class="feat-name">SHOPLINE 發送 LON 功能調整</span></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-12571" target="_blank"><span class="feat-num">08</span><span class="badge m-b">M</span><span class="feat-name">推播｜新增草稿狀態 ver1</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-19817" target="_blank"><span class="feat-num">09</span><span class="badge s-b">S</span><span class="feat-name">對話分類「待處理」改為「自動回覆」(補設計)</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20891" target="_blank"><span class="feat-num">10</span><span class="badge s-b">S</span><span class="feat-name">對話 2.0｜顧客資料的 Phone 與 Email 欄位可留空</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20299" target="_blank"><span class="feat-num">11</span><span class="badge s-b">S</span><span class="feat-name">匯入顧客資料｜匯入顧客、匯入社群聯絡人位置調整</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-11689" target="_blank"><span class="feat-num">12</span><span class="badge l-b">L</span><span class="feat-name">通訊渠道 > 網站對話插件設定 V2.0</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-21100" target="_blank"><span class="feat-num">13</span><span class="badge l-b">L</span><span class="feat-name">網站對話插件 V2.0</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20488" target="_blank"><span class="feat-num">14</span><span class="badge s-b">S</span><span class="feat-name">標籤管理｜依時間篩選支援顯示標籤來源</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21363" target="_blank"><span class="feat-num">15</span><span class="badge s-b">S</span><span class="feat-name">顧客管理｜新增說明文案</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21365" target="_blank"><span class="feat-num">16</span><span class="badge s-b">S</span><span class="feat-name">OmniLink｜目標渠道支援選擇 Facebook 渠道</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21388" target="_blank"><span class="feat-num">17</span><span class="badge s-b">S</span><span class="feat-name">[DS] 優惠券｜取消條碼與兌換按鈕相依關聯</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21560" target="_blank"><span class="feat-num">18</span><span class="badge s-b">S</span><span class="feat-name">91APP 會員設定｜支援綁定成功後貼標</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20907" target="_blank"><span class="feat-num">19</span><span class="badge s-b">S</span><span class="feat-name">帳務處理｜SG / MY 加上稅金</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20811" target="_blank"><span class="feat-num">20</span><span class="badge s-b">S</span><span class="feat-name">匯入顧客資料｜支援匯入社群聯絡人訂閱狀態</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-21724" target="_blank"><span class="feat-num">21</span><span class="badge m-b">M</span><span class="feat-name">月結帳單｜WABA 帳單支援 MM Lite 訊息類型</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-20601" target="_blank"><span class="feat-num">22</span><span class="badge m-b">M</span><span class="feat-name">社群聯絡人｜指定自訂屬性進行匯出</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://omnichatapp.slack.com/archives/C07UTKEU5MF/p1744967332367749" target="_blank"><span class="feat-num">23</span><span class="badge s-b">S</span><span class="feat-name">標籤管理｜標籤權限不足錯誤訊息</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-17551" target="_blank"><span class="feat-num">24</span><span class="badge m-b">M</span><span class="feat-name">標籤管理｜支援設定標籤群組</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20302" target="_blank"><span class="feat-num">25</span><span class="badge s-b">S</span><span class="feat-name">會員卡｜Shopify 訂單資料</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20779" target="_blank"><span class="feat-num">26</span><span class="badge s-b">S</span><span class="feat-name">遊戲模組｜調整獎項圖片尺寸限制</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21975" target="_blank"><span class="feat-num">27</span><span class="badge s-b">S</span><span class="feat-name">旅程｜CAPI onboard 流程簡化</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-17539" target="_blank"><span class="feat-num">28</span><span class="badge m-b">M</span><span class="feat-name">顧客管理｜支援刪除、合併顧客</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-21628" target="_blank"><span class="feat-num">29</span><span class="badge m-b">M</span><span class="feat-name">對話｜搜尋後的對話列表，顯示手動設定未讀的紅點</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-22176" target="_blank"><span class="feat-num">30</span><span class="badge m-b">M</span><span class="feat-name">旅程｜複製旅程節點</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22259" target="_blank"><span class="feat-num">31</span><span class="badge s-b">S</span><span class="feat-name">標籤管理｜支援匯出、匯入標籤</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21803" target="_blank"><span class="feat-num">32</span><span class="badge s-b">S</span><span class="feat-name">調整 WABA 計費方式 &amp; 新增國際驗證訊息費用</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22175" target="_blank"><span class="feat-num">33</span><span class="badge s-b">S</span><span class="feat-name">優惠券｜覆蓋優惠券核銷驗證碼</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-18788" target="_blank"><span class="feat-num">34</span><span class="badge m-b">M</span><span class="feat-name">對話｜LINE 支援傳送檔案</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22345" target="_blank"><span class="feat-num">35</span><span class="badge s-b">S</span><span class="feat-name">圖文選單｜圖文選單新增更新時機</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-22451" target="_blank"><span class="feat-num">36</span><span class="badge l-b">L</span><span class="feat-name">OMO 群發｜支援推播相關數據</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22652" target="_blank"><span class="feat-num">37</span><span class="badge s-b">S</span><span class="feat-name">遊戲模組｜遊戲資格設定</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><span class="feat-num">38</span><span class="badge s-b">S</span><span class="feat-name">補網站對話插件的訊息樣式：快速回覆、導購連結</span></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22695" target="_blank"><span class="feat-num">39</span><span class="badge s-b">S</span><span class="feat-name">Membership｜Shopify 訂單資料補齊機制</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22697" target="_blank"><span class="feat-num">40</span><span class="badge s-b">S</span><span class="feat-name">SHOPLINE LON｜支援訂單取消通知</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-18754" target="_blank"><span class="feat-num">41</span><span class="badge l-b">L</span><span class="feat-name">Loyalty｜批次點數發放 &amp; 領取紀錄</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-23193" target="_blank"><span class="feat-num">42</span><span class="badge s-b">S</span><span class="feat-name">簡訊｜新增發訊者名稱</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21762" target="_blank"><span class="feat-num">43</span><span class="badge s-b">S</span><span class="feat-name">推播｜匯出設定指引</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22874" target="_blank"><span class="feat-num">44</span><span class="badge s-b">S</span><span class="feat-name">91APP 會員設定新增推薦人 webhook 效期設定</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-22754" target="_blank"><span class="feat-num">45</span><span class="badge s-b">S</span><span class="feat-name">財務後台｜支援更新團隊幣別、費率</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-23447" target="_blank"><span class="feat-num">46</span><span class="badge s-b">S</span><span class="feat-name">對話搜尋｜選擇標籤時支援先選擇類別</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-23661" target="_blank"><span class="feat-num">47</span><span class="badge s-b">S</span><span class="feat-name">標籤｜下拉選標籤的 Placeholder 處理</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-23708" target="_blank"><span class="feat-num">48</span><span class="badge s-b">S</span><span class="feat-name">OmniLink｜Messenger 跳轉 LINE 流程新增外導網頁</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-22728" target="_blank"><span class="feat-num">49</span><span class="badge m-b">M</span><span class="feat-name">團隊資料｜允許登入的 IP 清單</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-23976" target="_blank"><span class="feat-num">50</span><span class="badge s-b">S</span><span class="feat-name">Slackbot 支援設定簡訊發送者名稱、後台說明文案調整</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-24152" target="_blank"><span class="feat-num">51</span><span class="badge s-b">S</span><span class="feat-name">互動遊戲（遊戲模組）｜LINE MINI App</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-23813" target="_blank"><span class="feat-num">52</span><span class="badge m-b">M</span><span class="feat-name">第三方應用｜91APP 會員資料差異同步 via sFTP</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-24543" target="_blank"><span class="feat-num">53</span><span class="badge s-b">S</span><span class="feat-name">OmniLink｜FB → LINE 引導網頁支援電腦版顯示 QRCode</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-24480" target="_blank"><span class="feat-num">54</span><span class="badge l-b">L</span><span class="feat-name">Marketing Message｜Facebook 行銷受眾</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-24552" target="_blank"><span class="feat-num">55</span><span class="badge s-b">S</span><span class="feat-name">[Broadcast] 保留 365 天內的推播名單</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-23300" target="_blank"><span class="feat-num">56</span><span class="badge s-b">S</span><span class="feat-name">Open API — Agent Message API supports video messages</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-24484" target="_blank"><span class="feat-num">57</span><span class="badge l-b">L</span><span class="feat-name">Marketing Message｜推播</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-24529" target="_blank"><span class="feat-num">58</span><span class="badge s-b">S</span><span class="feat-name">渠道聯絡人｜支援 LINE UID 搜尋</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-24510" target="_blank"><span class="feat-num">59</span><span class="badge s-b">S</span><span class="feat-name">發票活動｜增加允許同一張發票上傳至多個活動設定</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-25015" target="_blank"><span class="feat-num">60</span><span class="badge s-b">S</span><span class="feat-name">財務後台｜團隊帳戶資料支援使用 Customer ID 查找</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-22888" target="_blank"><span class="feat-num">61</span><span class="badge m-b">M</span><span class="feat-name">標籤｜類別清單</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-12571" target="_blank"><span class="feat-num">62</span><span class="badge s-b">S</span><span class="feat-name">推播｜新增草稿狀態 ver2</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-24991" target="_blank"><span class="feat-num">63</span><span class="badge s-b">S</span><span class="feat-name">帳務處理｜免費方案不支援儲值功能</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="L"><a href="https://easychat.atlassian.net/browse/OCPD-25104" target="_blank"><span class="feat-num">64</span><span class="badge l-b">L</span><span class="feat-name">Marketing Message｜推播 phase II</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-25122" target="_blank"><span class="feat-num">65</span><span class="badge s-b">S</span><span class="feat-name">第三方應用｜CYBERBIZ 支援 Refresh Token 失敗通知</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="M"><a href="https://easychat.atlassian.net/browse/OCPD-25691" target="_blank"><span class="feat-num">66</span><span class="badge m-b">M</span><span class="feat-name">Open API｜Message API - Google Map &amp; Quick-reply Message</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-25071" target="_blank"><span class="feat-num">67</span><span class="badge s-b">S</span><span class="feat-name">帳務處理｜新增儲值帳單即將取消、已取消通知信</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-21986" target="_blank"><span class="feat-num">68</span><span class="badge s-b">S</span><span class="feat-name">MM Lite｜硬限制上線前配套：允許特定團隊略過阻擋</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-26876" target="_blank"><span class="feat-num">69</span><span class="badge s-b">S</span><span class="feat-name">發票活動｜新增載具驗證碼欄位字數檢查與說明</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><span class="feat-num">70</span><span class="badge s-b">S</span><span class="feat-name">處理 csv 推播，存為草稿時無法保留 csv 檔案問題</span></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-20739" target="_blank"><span class="feat-num">71</span><span class="badge s-b">S</span><span class="feat-name">LINE 圖文選單｜新增設定 URL 阻擋貼標邏輯</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-25361" target="_blank"><span class="feat-num">72</span><span class="badge s-b">S</span><span class="feat-name">WhatsApp BSUID｜聯絡人詳情、顧客詳情、受眾預覽支援顯示 BSUID</span><span class="feat-arr">→</span></a></div>
+    <div class="feat-item" data-lv="S"><a href="https://easychat.atlassian.net/browse/OCPD-27344" target="_blank"><span class="feat-num">73</span><span class="badge s-b">S</span><span class="feat-name">WhatsApp BSUID｜QR Code 集點支援僅有 BSUID 的 WhatsApp 聯絡人</span><span class="feat-arr">→</span></a></div>
+  </div>
+</section>
+<section id="reviews">
+  <div class="sec-hdr"><div><div class="sec-eye">UI Review</div><h2 class="sec-title">UI 審查</h2></div><div class="sec-count">67</div></div>
+  <div class="feat-highlights">
+    <div class="feat-hl-item">
+      <div class="feat-hl-title">品質守門</div>
+      <div class="feat-hl-desc">在上線前系統性攔截視覺與互動落差，確保設計規範精準落地。</div>
+    </div>
+    <div class="feat-hl-item">
+      <div class="feat-hl-title">跨平台覆蓋</div>
+      <div class="feat-hl-desc">Review 範圍涵蓋 Web、iOS、Android，確保多渠道體驗一致。</div>
+    </div>
+  </div>
+  <div class="rev-grid">
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-19313" target="_blank"><span class="rev-num">01</span><span class="rev-name">New Search Collection 條件｜支援最後點擊、開封推播時間</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-19985" target="_blank"><span class="rev-num">02</span><span class="rev-name">優惠券｜調整序號包數量上限、新增狀態</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-18747" target="_blank"><span class="rev-num">03</span><span class="rev-name">LINE 圖文選單｜開啟 URL、切換圖文選單動作支援貼標</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-19719" target="_blank"><span class="rev-num">04</span><span class="rev-name">[Customization][CMHK] 銷售人員搶單機制</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20616" target="_blank"><span class="rev-num">05</span><span class="rev-name">匯入顧客資料｜支援顯示前五筆預覽內容</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20618" target="_blank"><span class="rev-num">06</span><span class="rev-name">對話、社群聯絡人、標籤管理｜更新標籤頻次支援程度說明</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-9433" target="_blank"><span class="rev-num">07</span><span class="rev-name">FB / IG 留言回覆改版</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20064" target="_blank"><span class="rev-num">08</span><span class="rev-name">標籤管理 Phase 2 — 支援標籤定期刪除</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-18036" target="_blank"><span class="rev-num">09</span><span class="rev-name">串接應用程式｜支援 SL 發送 LON</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20299" target="_blank"><span class="rev-num">10</span><span class="rev-name">匯入顧客資料｜匯入顧客、匯入社群聯絡人位置調整</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-16542" target="_blank"><span class="rev-num">11</span><span class="rev-name">Bot Builder 2.0｜條件分流自訂屬性支援相對時間篩選</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21167" target="_blank"><span class="rev-num">12</span><span class="rev-name">統計表 — 轉換率分析｜UI 改版</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21321" target="_blank"><span class="rev-num">13</span><span class="rev-name">[Hotfix] LINE 通知快捷｜SHOPLINE LON 設定優化</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21464" target="_blank"><span class="rev-num">14</span><span class="rev-name">[Hotfix] OmniLink｜目標渠道支援選擇 Facebook 渠道</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21503" target="_blank"><span class="rev-num">15</span><span class="rev-name">優惠券｜新增不可編輯序號發放數量情境</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21482" target="_blank"><span class="rev-num">16</span><span class="rev-name">對話 2.0｜顧客資料的 Phone 與 Email 欄位可留空</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21045" target="_blank"><span class="rev-num">17</span><span class="rev-name">顧客管理｜非 CDP 新增說明文案、修正 CDP 配額錯誤</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-19845" target="_blank"><span class="rev-num">18</span><span class="rev-name">對話｜可將對話手動設定為「未讀」</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21938" target="_blank"><span class="rev-num">19</span><span class="rev-name">[Hotfix] 月結帳單｜WABA 帳單支援 MM Lite 訊息類型</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-21688" target="_blank"><span class="rev-num">20</span><span class="rev-name">發送測試訊息｜改善錯誤訊息文案</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22312" target="_blank"><span class="rev-num">21</span><span class="rev-name">串接社群通訊渠道｜Co-existence for WhatsApp Business App</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20302" target="_blank"><span class="rev-num">22</span><span class="rev-name">Membership｜Shopify order info (LINE Membership Card)</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22646" target="_blank"><span class="rev-num">23</span><span class="rev-name">遊戲模組｜前端元件修改</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-11689" target="_blank"><span class="rev-num">24</span><span class="rev-name">通訊渠道 > 網站對話插件設定 V2.0</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22860" target="_blank"><span class="rev-num">25</span><span class="rev-name">[Chat][LINE] 支援傳送檔案</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22222" target="_blank"><span class="rev-num">26</span><span class="rev-name">旅程｜複製旅程節點</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22864" target="_blank"><span class="rev-num">27</span><span class="rev-name">推播｜貼標時支援先選擇類別</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23724" target="_blank"><span class="rev-num">28</span><span class="rev-name">簡訊｜新增發訊者名稱</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23771" target="_blank"><span class="rev-num">29</span><span class="rev-name">Loyalty｜QR Code 集點連結設定</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23762" target="_blank"><span class="rev-num">30</span><span class="rev-name">Loyalty｜QR Code 集點連結領取紀錄</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23731" target="_blank"><span class="rev-num">31</span><span class="rev-name">標籤管理｜支援匯出、匯入標籤</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24073" target="_blank"><span class="rev-num">32</span><span class="rev-name">[Android] 顧客貼標、對話搜尋｜選擇標籤支援先選擇類別</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24075" target="_blank"><span class="rev-num">33</span><span class="rev-name">[iOS] 顧客貼標、Omni AI｜選擇標籤支援先選擇類別</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24046" target="_blank"><span class="rev-num">34</span><span class="rev-name">91APP 會員設定｜支援綁定成功後貼標 &amp; Customer Update Webhook</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22874" target="_blank"><span class="rev-num">35</span><span class="rev-name">[91APP] 推薦人 Webhook 同步 Phase 2 — 推薦人效期</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23708" target="_blank"><span class="rev-num">36</span><span class="rev-name">OmniLink｜Messenger 跳轉 LINE 流程新增外導網頁</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23976" target="_blank"><span class="rev-num">37</span><span class="rev-name">Slackbot 支援設定簡訊發送者名稱、後台說明文案調整</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24500" target="_blank"><span class="rev-num">38</span><span class="rev-name">機器人、旅程、對話搜尋｜選擇標籤時支援先選擇類別</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22175" target="_blank"><span class="rev-num">39</span><span class="rev-name">優惠券｜覆蓋優惠券核銷驗證碼</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24538" target="_blank"><span class="rev-num">40</span><span class="rev-name">遊戲模組｜新版遊戲樣式</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24575" target="_blank"><span class="rev-num">41</span><span class="rev-name">旅程｜訊息節點預覽與 UI 修正</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-19441" target="_blank"><span class="rev-num">42</span><span class="rev-name">LINE 通知快捷｜支援刪除設定</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22221" target="_blank"><span class="rev-num">43</span><span class="rev-name">渠道聯絡人｜批次變更訂閱狀態、刪除聯絡人</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20488" target="_blank"><span class="rev-num">44</span><span class="rev-name">標籤｜依時間篩選支援顯示標籤來源</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-20418" target="_blank"><span class="rev-num">45</span><span class="rev-name">網站對話插件 V2.0 — Chat</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23300" target="_blank"><span class="rev-num">46</span><span class="rev-name">Open API — Agent Message API supports video messages</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-17240" target="_blank"><span class="rev-num">47</span><span class="rev-name">推播｜調整 CSV 檔案的檢查邏輯與提示</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25014" target="_blank"><span class="rev-num">48</span><span class="rev-name">帳務總覽｜支援顯示帳單及交易紀錄貨幣</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25071" target="_blank"><span class="rev-num">49</span><span class="rev-name">帳務處理｜新增儲值帳單即將取消、已取消通知信</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-22888" target="_blank"><span class="rev-num">50</span><span class="rev-name">標籤｜類別管理</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25015" target="_blank"><span class="rev-num">51</span><span class="rev-name">財務後台｜團隊帳戶資料支援使用 Customer ID 查找</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25122" target="_blank"><span class="rev-num">52</span><span class="rev-name">第三方應用｜CYBERBIZ 支援 Refresh Token 過期通知</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24991" target="_blank"><span class="rev-num">53</span><span class="rev-name">帳務總覽｜免費方案不支援儲值功能</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25691" target="_blank"><span class="rev-num">54</span><span class="rev-name">Open API｜Message API — Quick-reply Message</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24552" target="_blank"><span class="rev-num">55</span><span class="rev-name">[Broadcast] 保留 2 年內的推播名單 — Phase 1</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24480" target="_blank"><span class="rev-num">56</span><span class="rev-name">Marketing Message｜Facebook 行銷受眾</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25104" target="_blank"><span class="rev-num">57</span><span class="rev-name">Marketing Message｜推播 phase II</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24484" target="_blank"><span class="rev-num">58</span><span class="rev-name">Marketing Message｜推播 phase I</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-24510" target="_blank"><span class="rev-num">59</span><span class="rev-name">發票活動｜增加允許同一張發票上傳至多個活動設定</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23266" target="_blank"><span class="rev-num">60</span><span class="rev-name">[OMO][Mobile] 群發支援相關數據</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25021" target="_blank"><span class="rev-num">61</span><span class="rev-name">[Broadcast] 保留 2 年內的推播名單 — Phase 2</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-26727" target="_blank"><span class="rev-num">62</span><span class="rev-name">優惠券｜前端應阻擋在 LINE Point 兌換時貼標</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25810" target="_blank"><span class="rev-num">63</span><span class="rev-name">Open API｜Message API — Google Map</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-12571" target="_blank"><span class="rev-num">64</span><span class="rev-name">推播｜新增草稿狀態</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-23938" target="_blank"><span class="rev-num">65</span><span class="rev-name">WhatsApp Carousel Template 卡片內文新增字數判斷（含 Mobile）</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-25071" target="_blank"><span class="rev-num">66</span><span class="rev-name">帳務處理｜新增儲值帳單即將取消、已取消通知信</span><span class="rev-arr">→</span></a></div>
+    <div class="rev-item"><a href="https://easychat.atlassian.net/browse/OCPD-26302" target="_blank"><span class="rev-num">67</span><span class="rev-name">對話以訊息內容搜尋新增時間區間選項（包含 Mobile）</span><span class="rev-arr">→</span></a></div>
+  </div>
+</section>
+
+<section id="qa" class="qa-section">
+  <div class="sec-hdr">
+    <div>
+      <div class="sec-eye">Performance Review</div>
+      <h2 class="sec-title">自我評估</h2>
+    </div>
+  </div>
+  <div class="qa-block">
+    <div class="qa-q">Q1 — Please share at least 2 accomplishments in past 12 months and highlight the impact of the work deliverables and quality of those accomplishments. What skills and expertise helped you to excel?</div>
+
+    <div class="qa-item">
+      <div class="qa-item-title">1. 完成 73 項跨規模功能開發，確保多渠道體驗一致性</div>
+      <div class="qa-body">
+        <p>在過去一年內負責並交付 73 件 S/M/L 規模的功能設計，涵蓋主導網站對話插件改版 V2.0（設定端、插件端、對話模組三方平台）、各種跨模組功能的迭代、財務帳務系統等複雜業務邏輯。完成 67 筆 UI Review。</p>
+        <div class="qa-sub">關鍵影響力</div>
+        <div class="qa-indent">
+          <p><strong>技術可行性共識：</strong>針對較特殊的互動行為積極運用 AI 工具快速產出 Prototype，在開發前期與 RD 針對元件複雜互動（如標籤多類別搜尋、IP 清單設定）達成共識後再進行設計，降低後期修改成本。</p>
+          <p><strong>系統化設計思維：</strong>成功將「貼標行為」等重複性邏輯整理為通用元件。定義適合開發的插件 RWD 規範，提升產品長期維護的穩定性。以網站對話插件 V2.0 的遠雄客製專案為起點，將客製需求昇華為標準化的產品架構。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-item-title">2. 自主研發「半自動化 UI Review 工具」，提升 UI Review 效率</div>
+      <div class="qa-body">
+        <p>針對產品快速迭代、人工驗收耗時且易產生視覺誤差的痛點，自主發想並利用 AI 輔助開發半自動化驗收工具。</p>
+        <div class="qa-sub">關鍵影響力</div>
+        <div class="qa-indent">
+          <p><strong>效率提升：</strong>工具針對基礎視覺樣式（如間距、圓角、色碼）的檢查效率提升 50%；以整體 UI Review 工作流（含互動邏輯驗收但不含開 bug 票時間）計算，約節省 20% 的總工時。</p>
+          <p><strong>降低行政成本：</strong>優化了從「發現 Bug」到「Jira 開票紀錄」的斷點，減少手動截圖與撰寫描述的繁瑣過程，降低漏報風險，確保設計規範精準落地。</p>
+          <p><strong>專業價值：</strong>導入 DesignOps 思維，將個人經驗轉化為團隊數位資產，優化設計與工程間的協作體驗。</p>
+        </div>
+        <div class="qa-sub" id="formula" style="scroll-margin-top:72px">效率提升計算公式</div>
+        <div class="qa-indent">
+          <p><strong>項目 A：基礎視覺驗收（佔比 40%）</strong><br>包含：間距、圓角、色碼等 CSS 樣式。提升效益：50%（透過工具自動偵測，取代人工點選元件查找資料）。</p>
+          <p><strong>項目 B：互動流程驗收（佔比 60%）</strong><br>包含：跳轉邏輯、邊緣案例、字串檢查。提升效益：0%（維持人工深度測試，確保品質）。</p>
+          <p>綜上所述，整體 Review 效率提升約為：<br>(40% 權重 × 50% 加速) = <strong>20% 整體工時節省</strong></p>
+        </div>
+        <p class="qa-note">註：此計算尚未包含因工具輔助標註，所額外節省的「Jira 手動開票時間」。</p>
+      </div>
+    </div>
+
+    <div class="qa-q" style="margin-top:32px">Q2 — How can you elevate your overall performance going forward? Please reference specific skills or expertise you can further build upon.</div>
+
+    <div class="qa-item">
+      <div class="qa-item-title">1. 持續深化半自動化 UI Review 工具</div>
+      <div class="qa-body">
+        <p>計畫持續優化今年自主研發的半自動化 UI Review 工具。目前工具在適應不同前端專案架構時仍有限制，且尚未涵蓋 border-color、border-width、font-weight 等 CSS 屬性的檢查。接下來的目標是擴大檢查範圍、提升跨專案的相容性，待工具穩定後再與設計團隊分享，使其成為團隊共用的資源。</p>
+      </div>
+    </div>
+
+    <div class="qa-item">
+      <div class="qa-item-title">2. 設計影響力的可量化</div>
+      <div class="qa-body">
+        <p>目前工作成果多以功能交付數量來衡量，未來希望嘗試建立更接近產品結果的指標，例如特定設計改版後的使用者操作完成率、UI Review 攔截問題的比率，讓設計貢獻對業務的影響更具說服力。</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+<footer>
+  <div class="ft">2025/03 – 2026/03 設計成果報告</div>
+  <div class="ft">Product Design · UI Review · Tooling</div>
+</footer>
+<script>
+document.querySelectorAll('.f-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.f-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const f=btn.dataset.f;
+    document.querySelectorAll('.feat-item').forEach(item=>{
+      item.classList.toggle('hidden',f!=='all'&&item.dataset.lv!==f);
+    });
+  });
+});
+
+const PLAY_ICON='<path d="M8 5v14l11-7z"/>';
+const PAUSE_ICON='<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+
+function fmt(s){const m=Math.floor(s/60);return m+':'+(Math.floor(s%60)+'').padStart(2,'0')}
+
+function initPlayer(id){
+  const v=document.getElementById(id);
+  const box=document.getElementById('box-'+id);
+  const overlay=document.getElementById('ov-'+id);
+  const pb=document.getElementById('pb-'+id);
+  const pw=document.getElementById('pw-'+id);
+  const ic=document.getElementById('ic-'+id);
+  const tm=document.getElementById('tm-'+id);
+
+  v.addEventListener('loadedmetadata',()=>{
+    tm.textContent='0:00 / '+fmt(v.duration);
+  });
+  v.addEventListener('timeupdate',()=>{
+    if(!v.duration)return;
+    pb.style.width=(v.currentTime/v.duration*100)+'%';
+    tm.textContent=fmt(v.currentTime)+' / '+fmt(v.duration);
+  });
+  v.addEventListener('ended',()=>{
+    box.classList.remove('playing');
+    overlay.classList.remove('hidden');
+    ic.innerHTML=PLAY_ICON;
+    pb.style.width='0%';
+    v.currentTime=0;
+  });
+
+  pw.addEventListener('click',e=>{
+    if(!v.duration)return;
+    const r=pw.getBoundingClientRect();
+    v.currentTime=((e.clientX-r.left)/r.width)*v.duration;
+  });
+}
+
+function togglePlay(id){
+  const v=document.getElementById(id);
+  const box=document.getElementById('box-'+id);
+  const overlay=document.getElementById('ov-'+id);
+  const ic=document.getElementById('ic-'+id);
+  if(v.paused){
+    v.play();
+    box.classList.add('playing');
+    overlay.classList.add('hidden');
+    ic.innerHTML=PAUSE_ICON;
+  } else {
+    v.pause();
+    box.classList.remove('playing');
+    overlay.classList.remove('hidden');
+    ic.innerHTML=PLAY_ICON;
+  }
+}
+
+function toggleFS(id){
+  const v=document.getElementById(id);
+  if(!document.fullscreenElement){
+    v.requestFullscreen && v.requestFullscreen();
+  } else {
+    document.exitFullscreen && document.exitFullscreen();
+  }
+}
+
+initPlayer('vb');
+initPlayer('va');
+
+// cursor glow
+(function(){
+  const glow = document.getElementById('cursor-glow');
+  let cx = 0, cy = 0, tx = 0, ty = 0;
+  document.addEventListener('mousemove', e => {
+    tx = e.clientX; ty = e.clientY;
+    glow.style.opacity = '1';
+  });
+  document.addEventListener('mouseleave', () => glow.style.opacity = '0');
+  function animate(){
+    cx += (tx - cx) * 0.1;
+    cy += (ty - cy) * 0.1;
+    glow.style.left = cx + 'px';
+    glow.style.top  = cy + 'px';
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
