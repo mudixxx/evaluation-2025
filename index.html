@@ -555,7 +555,10 @@ initPlayer('va');
 
 // cursor glow — 觸控裝置不啟動
 (function(){
-  if(window.matchMedia('(hover: none)').matches) return;
+  const isTouch = window.matchMedia('(hover: none)').matches
+    || navigator.maxTouchPoints > 0
+    || 'ontouchstart' in window;
+  if(isTouch) return;
   const glow = document.getElementById('cursor-glow');
   let cx = 0, cy = 0, tx = 0, ty = 0;
   document.addEventListener('mousemove', e => {
